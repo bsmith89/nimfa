@@ -95,6 +95,13 @@ class Nsnmf(nmf_ns.Nmf_ns):
        matrix factors. Default is None.
     :type callback_init: `function`
 
+    :param callback_iter: Pass a callback function that is called after each
+       step during fitting.  This is useful if one wants to display the
+       progress of fitting. The callback function is called with only one
+       argument :class:`models.mf_fit.Mf_fit` that contains the fitted model.
+       Default is None.
+    :type callback: `function`
+
     :param track_factor: When :param:`track_factor` is specified, the fitted
         factorization model is tracked during multiple runs of the algorithm. This
         option is taken into account only when multiple runs are executed
@@ -140,13 +147,14 @@ class Nsnmf(nmf_ns.Nmf_ns):
     """
     def __init__(self, V, seed=None, W=None, H=None, rank=30, max_iter=30,
                  min_residuals=1e-5, test_conv=None, n_run=1, callback=None,
-                 callback_init=None, track_factor=False, track_error=False,
-                 theta=0.5, **options):
+                 callback_init=None, callback_iter=None, track_factor=False,
+                 track_error=False, theta=0.5, **options):
         self.name = "nsnmf"
         self.aseeds = ["random", "fixed", "nndsvd", "random_c", "random_vcol"]
         nmf_ns.Nmf_ns.__init__(self, vars())
         self.tracker = mf_track.Mf_track() if self.track_factor and self.n_run > 1 \
                                               or self.track_error else None
+        self.callback_iter = callback_iter
 
     def factorize(self):
         """
@@ -170,6 +178,8 @@ class Nsnmf(nmf_ns.Nmf_ns):
                 p_obj = c_obj if not self.test_conv or iter % self.test_conv == 0 else p_obj
                 self.update()
                 iter += 1
+                if self.callback_iter:
+                    self.callback_iter(self)
                 c_obj = self.objective(
                 ) if not self.test_conv or iter % self.test_conv == 0 else c_obj
                 if self.track_error:
