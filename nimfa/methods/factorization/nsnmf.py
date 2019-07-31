@@ -179,6 +179,8 @@ class Nsnmf(nmf_ns.Nmf_ns):
                 self.update()
                 iter += 1
                 if self.callback_iter:
+                    self._p_obj = p_obj
+                    self._c_obj = c_obj
                     self.callback_iter(self)
                 c_obj = self.objective(
                 ) if not self.test_conv or iter % self.test_conv == 0 else c_obj
