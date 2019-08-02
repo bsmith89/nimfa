@@ -178,12 +178,12 @@ class Nsnmf(nmf_ns.Nmf_ns):
                 p_obj = c_obj if not self.test_conv or iter % self.test_conv == 0 else p_obj
                 self.update()
                 iter += 1
+                c_obj = self.objective(
+                ) if not self.test_conv or iter % self.test_conv == 0 else c_obj
                 if self.callback_iter:
                     self._p_obj = p_obj
                     self._c_obj = c_obj
                     self.callback_iter(self)
-                c_obj = self.objective(
-                ) if not self.test_conv or iter % self.test_conv == 0 else c_obj
                 if self.track_error:
                     self.tracker.track_error(run, c_obj)
             if self.callback:
